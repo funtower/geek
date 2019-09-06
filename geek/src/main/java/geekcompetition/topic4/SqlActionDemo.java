@@ -15,24 +15,30 @@ public class SqlActionDemo {
 		Connection conn = null;
 		try {
 			conn = getConnection();
+			SqlActionBase action1 = new SqlAction();
+			action1.setSql(
+					"INSERT INTO acct_charge_info  (acct_id, acct_tran_id, tran_date, tran_amt, acct_no, dc_flag, to_acct_no) VALUES ('1', 'tr0000001', '2018-08-08', 1000, 'no100000', 'D', 'no200000')");
+			SqlActionBase action2 = new SqlAction();
+			action2.setSql(
+					"INSERT INTO acct_charge_info  (acct_id, acct_tran_id, tran_date, tran_amt, acct_no, dc_flag, to_acct_no) VALUES ('1', 'tr0000001', '2018-08-08', 1000, 'no200000', 'C', 'no100000')");
+			SqlActionBase action3 = new SqlAction();
+			action3.setSql(
+					"INSERT INTO acct_trans_info  (chnl_tran_id, tran_date, tran_amt, out_acct_no, in_acct_no, tran_sts) VALUES ('tr0000001', '2018-08-08', 1000, 'no100000', 'no200000', '01')");
+
+			action1.setConn(conn);
+			action1.setTrxFlag(SqlActionBase.TRX_REQUIRED);
+			action2.setTrxFlag(SqlActionBase.TRX_REQUIRED);
+			action3.setTrxFlag(SqlActionBase.TRX_REQUIRE_NEW);
+			action1.next(action2).next(action3);
+			action1.execute();
+			conn.close();
 		} catch (Exception e) {
+			e.printStackTrace();
 		}
-		SqlActionBase action1 = new SqlAction();
-		action1.setSql("INSERT INTO acct_charge_info  (acct_id, acct_tran_id, tran_date, tran_amt, acct_no, dc_flag, to_acct_no) VALUES ('1', 'tr0000001', '2018-08-08', 1000, 'no100000', 'D', 'no200000')");
-		SqlActionBase action2 = new SqlAction();
-		action2.setSql("INSERT INTO acct_charge_info  (acct_id, acct_tran_id, tran_date, tran_amt, acct_no, dc_flag, to_acct_no) VALUES ('1', 'tr0000001', '2018-08-08', 1000, 'no200000', 'C', 'no100000')");
-		SqlActionBase action3 = new SqlAction();
-		action3.setSql("INSERT INTO acct_trans_info  (chnl_tran_id, tran_date, tran_amt, out_acct_no, in_acct_no, tran_sts) VALUES ('tr0000001', '2018-08-08', 1000, 'no100000', 'no200000', '01')");
-		
-		action1.setConn(conn);
-		action1.setTrxFlag(SqlActionBase.TRX_REQUIRED);
-		action2.setTrxFlag(SqlActionBase.TRX_REQUIRED);
-		action3.setTrxFlag(SqlActionBase.TRX_REQUIRE_NEW);
-		action1.next(action2).next(action3);
-		action1.execute();
 	}
-	
-	public static Connection getConnection() throws FileNotFoundException, IOException, ClassNotFoundException, SQLException {
+
+	public static Connection getConnection()
+			throws FileNotFoundException, IOException, ClassNotFoundException, SQLException {
 		String currentPath = SqlAction.class.getResource("").getPath();
 		try {
 			// 去除中文路径乱码的问题
