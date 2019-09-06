@@ -4,9 +4,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.ArrayDeque;
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
 import java.util.Map;
 import java.util.Queue;
 
@@ -25,11 +23,8 @@ public class MatchMarket {
 				.parse("E:/FUNTOWER/project/wokspace/GeekTopic/git-repo/geek/src/main/resources/InputFile.txt");
 		Collection<StockInfoInput> sell = parse.get("sell");
 		Collection<StockInfoInput> bite = parse.get("bite");
-		System.out.println(sell.size());
 		ArrayDeque<StockInfoInput> sellQ = new ArrayDeque<StockInfoInput>(sell);
 		ArrayDeque<StockInfoInput> biteQ = new ArrayDeque<StockInfoInput>(bite);
-		System.out.println("-------");
-		List<String> tradeFlow = new ArrayList<String>();
 		OutputStream out = null;
 		int i = 0;
 		try {
@@ -58,7 +53,6 @@ public class MatchMarket {
 					record.append(ss.getStockCode()).append(",").append(ss.getCustId()).append(",")
 							.append(sb.getCustId()).append(",").append(ss.getUnitPrice()).append(",")
 							.append(ss.getShare());
-					// tradeFlow.add(record.toString());
 					ss.setShare(0);
 					sb.setShare(0);
 				} else if (ss.getShare().intValue() > sb.getShare().intValue()) {
@@ -66,7 +60,6 @@ public class MatchMarket {
 					record.append(ss.getStockCode()).append(",").append(ss.getCustId()).append(",")
 							.append(sb.getCustId()).append(",").append(ss.getUnitPrice()).append(",")
 							.append(sb.getShare());
-					// tradeFlow.add(record.toString());
 					ss.setShare(ss.getShare().intValue() - sb.getShare().intValue());
 					sb.setShare(0);
 					sellQ.offerFirst(ss);
@@ -75,7 +68,6 @@ public class MatchMarket {
 					record.append(ss.getStockCode()).append(",").append(ss.getCustId()).append(",")
 							.append(sb.getCustId()).append(",").append(ss.getUnitPrice()).append(",")
 							.append(ss.getShare());
-					// tradeFlow.add(record.toString());
 					sb.setShare(sb.getShare().intValue() - ss.getShare().intValue());
 					ss.setShare(0);
 					biteQ.offerFirst(sb);
@@ -92,7 +84,6 @@ public class MatchMarket {
 				e.printStackTrace();
 			}
 		}
-		// System.out.println(tradeFlow);
 	}
 
 	private StockInfoInput getNotEmptyShare(StockInfoInput stock, Queue<StockInfoInput> q) {
