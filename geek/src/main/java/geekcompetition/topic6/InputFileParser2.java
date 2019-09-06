@@ -6,47 +6,19 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.TreeSet;
 
-public class InputFileParser {
+public class InputFileParser2 {
 
-	public static Map<String, TreeSet<StockInfoInput>> parse(String filePath) {
-		Map<String, TreeSet<StockInfoInput>> result = new HashMap<String, TreeSet<StockInfoInput>>();
+	public static Map<String, ArrayList<StockInfoInput>> parse(String filePath) {
+		Map<String, ArrayList<StockInfoInput>> result = new HashMap<String, ArrayList<StockInfoInput>>();
 		// 卖出股票集合，按价格优先，时间优先排序
-		TreeSet<StockInfoInput> sell = new TreeSet<>(new Comparator<StockInfoInput>() {
-			@Override
-			public int compare(StockInfoInput o1, StockInfoInput o2) {
-				int compareTo = o1.getUnitPrice().compareTo(o2.getUnitPrice());
-				if (compareTo == 0) {
-					compareTo = Integer.compare(Integer.parseInt(o2.getTradeTime()),
-							Integer.parseInt(o1.getTradeTime()));
-					if (compareTo == 0) {
-						// 若最终比较结果还是0，那必须返回一个非零数，否则add方法会把比较结果为0的记录合并导致记录丢失
-						return 1;
-					}
-				}
-				return compareTo;
-			};
-		});
+		ArrayList<StockInfoInput> sell = new ArrayList<>();
 		// 买入股票集合，按价格优先，时间优先排序
-		TreeSet<StockInfoInput> bite = new TreeSet<>(new Comparator<StockInfoInput>() {
-			@Override
-			public int compare(StockInfoInput o1, StockInfoInput o2) {
-				int compareTo = o2.getUnitPrice().compareTo(o1.getUnitPrice());
-				if (compareTo == 0) {
-					compareTo = Integer.compare(Integer.parseInt(o2.getTradeTime()),
-							Integer.parseInt(o1.getTradeTime()));
-					if (compareTo == 0) {
-						// 若最终比较结果还是0，那必须返回一个非零数，否则add方法会把比较结果为0的记录合并导致记录丢失
-						return 1;
-					}
-				}
-				return compareTo;
-			};
-		});
+		ArrayList<StockInfoInput> bite = new ArrayList<>();
 		// 日常指定读取的文件
 		File file = new File(filePath);
 		if (!file.exists()) {
@@ -69,6 +41,29 @@ public class InputFileParser {
 						// 2:买入
 						bite.add(stock);
 					}
+					sell.sort(new Comparator<StockInfoInput>() {
+						@Override
+						public int compare(StockInfoInput o1, StockInfoInput o2) {
+							int compareTo = o1.getUnitPrice().compareTo(o2.getUnitPrice());
+							if (compareTo == 0) {
+								compareTo = Integer.compare(Integer.parseInt(o2.getTradeTime()),
+										Integer.parseInt(o1.getTradeTime()));
+							}
+							return compareTo;
+						}
+					});
+					bite.sort(new Comparator<StockInfoInput>() {
+						@Override
+						public int compare(StockInfoInput o1, StockInfoInput o2) {
+							int compareTo = o2.getUnitPrice().compareTo(o1.getUnitPrice());
+							if (compareTo == 0) {
+								compareTo = Integer.compare(Integer.parseInt(o2.getTradeTime()),
+										Integer.parseInt(o1.getTradeTime()));
+							}
+							return compareTo;
+
+						}
+					});
 					result.put("sell", sell);
 					result.put("bite", bite);
 				}
